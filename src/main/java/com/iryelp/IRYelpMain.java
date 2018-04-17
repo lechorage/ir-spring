@@ -10,12 +10,12 @@ import java.util.*;
 import java.util.Map.Entry;
 
 public class IRYelpMain {
-    Map<String, HashMap<Integer, Integer>> postingList;
-    Map<String, Integer> tokenDict;
-    Map<Integer, String[]> reviewTable;                    // reviews dict map
-    Map<Integer, String[]> restaurantTable;            // restaurant map
-    Map<String, String[]> urlMap;                                // url map
-    Map<String, HashSet<String>> synonymsMap;
+    private Map<String, HashMap<Integer, Integer>> postingList;
+    private Map<String, Integer> tokenDict;
+    private Map<Integer, String[]> reviewTable;                    // reviews dict map
+    private Map<Integer, String[]> restaurantTable;            // restaurant map
+    private Map<String, String[]> urlMap;                                // url map
+    private Map<String, HashSet<String>> synonymsMap;
 
     public IRYelpMain() throws IOException {
         /*
@@ -43,7 +43,7 @@ public class IRYelpMain {
          * Part 2: Review score calculation and restaurant ranking
          */
 
-        List<Restaurant> myList = new ArrayList<Restaurant>();
+        List<Restaurant> myList = new ArrayList<>();
         IndexReader reader = new IndexReader(userQuery, synonymsMap, tokenDict);
         String[] query = reader.getQueryWithSynonyms();
         System.out.print("Your query is: ");
@@ -60,7 +60,7 @@ public class IRYelpMain {
         }
 
         // rank restaurants
-        myList.sort(Collections.reverseOrder((a, b) -> Double.compare(a.getRestaurantScore(), b.getRestaurantScore())));
+        myList.sort(Collections.reverseOrder(Comparator.comparingDouble(Restaurant::getRestaurantScore)));
 
         // select and print topN restaurants
         for (Restaurant r : myList.subList(0, topN)) {
@@ -77,9 +77,12 @@ public class IRYelpMain {
             adding.put("resName", name);
             adding.put("address", address);
             adding.put("url", url);
-            ArrayList<String> reviews = new ArrayList<>();
+            ArrayList<HashMap<String, String>> reviews = new ArrayList<>();
             for (Entry<Integer, String> entry : reviewMap.entrySet()) {
-                reviews.add(entry.getKey() + ", " + entry.getValue());
+                HashMap<String, String> review = new HashMap<>();
+                review.put("id", String.valueOf(entry.getKey()));
+                review.put("content", entry.getValue());
+                reviews.add(review);
             }
             adding.put("reviews", reviews);
             springNeed.add(adding);
