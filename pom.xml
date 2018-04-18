@@ -12,10 +12,6 @@
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.0.1.RELEASE</version>
     </parent>
-    <properties>
-        <!-- the main class -->
-        <exec.mainClass>hello.Application</exec.mainClass>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -34,6 +30,8 @@
     </dependencies>
 
     <properties>
+        <exec.mainClass>hello.Application</exec.mainClass>
+
         <java.version>1.8</java.version>
     </properties>
 
