@@ -23,32 +23,42 @@ import Indexing.Review;
 import PreProcess.ProcessDocuments;
 
 public class AlternativeMain {
+	private Map<String, HashMap<Integer, Integer>> postingList;
+	private Map<String, Integer> tokenDict;
+	private Map<Integer, String[]> reviewTable;                    // reviews dict map
+	private Map<Integer, String[]> restaurantTable;            // restaurant map
+	private Map<String, String[]> urlMap;                                // url map
+	private Map<String, HashSet<String>> synonymsMap;
 
-	public static void main(String[] args) throws IOException {
-		
-		// your input
-		String userQuery = "awesome pizza";
-		double alpha = 0.5;	// review-star weight			
+	public AlternativeMain() throws IOException {
+		/*
+		 * Part 1: Load into memory when web page opens to reduce searching time
+		 */
+
+		FileLoader fl = new FileLoader();
+		postingList = fl.loadPostingList();    // posting list map
+		tokenDict = fl.loadTokenDict();                            // token dict map
+		reviewTable = fl.loadReviewTable();                    // reviews dict map
+		restaurantTable = fl.loadrestaurantTable();            // restaurant map
+		urlMap = fl.loadUrlMap();                                // url map
+		synonymsMap = fl.loadSynonymsMap();
+
+	}
+
+	public ArrayList<HashMap<String, Object>> search(String userQuery) throws IOException {
+		ArrayList<HashMap<String, Object>> springNeed = new ArrayList<>();
+
+		double alpha = 0.5;	// review-star weight
 		int topN = 5; 		// top N restaurants display
 		int topK = 3;		// latest topK reviews display
 		
-		/*  
-		 * Part 1: Load into memory when web page opens to reduce searching time
-		 */
-		
-		FileLoader fl = new FileLoader();
-		Map <String, HashMap<Integer, Integer>> postingList = fl.loadPostingList();	// posting list map
-		Map <String, Integer> tokenDict = fl.loadTokenDict();							// token dict map
-		Map <Integer, String[]> reviewTable = fl.loadReviewTable();					// reviews dict map
-		Map <Integer, String[]> restaurantTable = fl.loadrestaurantTable();			// restaurant map
-		Map <String, String[]> urlMap = fl.loadUrlMap();								// url map
-		Map <String, HashSet<String>> synonymsMap = fl.loadSynonymsMap();
+
 	
 		/*
 		 * Part 2: Review-score calculation and restaurant ranking	   
 		 */
 		
-		List <Restaurant> myList = new ArrayList<Restaurant>();
+		List <Restaurant> myList = new ArrayList<>();
 		Map<Integer, Restaurant> finalRestaurantMap = new HashMap<Integer, Restaurant>();
 		IndexReader reader = new IndexReader(userQuery, synonymsMap, tokenDict);
 		HashSet<String[]> queries = reader.getQueries();
@@ -109,14 +119,24 @@ public class AlternativeMain {
 				String address = info[1];
 				String url = info[2];
 				Map<Integer, String> reviewMap = r.getTopKReviews(topK, reviewTable);
-				
-				System.out.println(r.getRestaurantScore() + " " + name + " " + address + " " + url);
-				
-				for (Entry<Integer, String> entry: reviewMap.entrySet())
-					System.out.println("\t" + entry.getKey() + " " + entry.getValue());	
+				HashMap<String, Object> adding = new HashMap<>();
+				String score = String.valueOf(r.getRestaurantScore());
+				adding.put("score", score);
+				adding.put("resName", name);
+				adding.put("address", address);
+				adding.put("url", url);
+				ArrayList<HashMap<String, String>> reviews = new ArrayList<>();
+				for (Entry<Integer, String> entry : reviewMap.entrySet()) {
+					HashMap<String, String> review = new HashMap<>();
+					review.put("id", String.valueOf(entry.getKey()));
+					review.put("content", entry.getValue());
+					reviews.add(review);
+				}
+				adding.put("reviews", reviews);
+				springNeed.add(adding);
 			}
 		}
-		
+		return springNeed;
 	}
 	
 }
