@@ -104,11 +104,7 @@ public class AlternativeMain {
 		}
 		
 		// rank restaurants
-		Collections.sort(myList, Collections.reverseOrder(new Comparator<Restaurant>() {
-            public int compare(Restaurant a, Restaurant b) {
-                return Double.compare(a.getRestaurantScore(), b.getRestaurantScore());
-            }
-	     }));
+		myList.sort(Collections.reverseOrder((a, b) -> Double.compare(a.getRestaurantScore(), b.getRestaurantScore())));
 		
 		// select and print topN restaurants
 		if (!(myList.size() == 0)) {
