@@ -128,7 +128,7 @@ public class AlternativeMain {
                 for (Entry<Integer, String> entry : reviewMap.entrySet()) {
                     HashMap<String, String> review = new HashMap<>();
                     review.put("id", String.valueOf(entry.getKey()));
-                    review.put("content", entry.getValue().replace("\n\n", "\n"));
+                    review.put("content", entry.getValue().replaceAll("\n\n", "\n"));
                     reviews.add(review);
                 }
                 adding.put("reviews", reviews);

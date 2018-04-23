@@ -1,12 +1,51 @@
 package PreProcess;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
 
 public class ProcessDocuments {
+	
+	public static void main(String[] args) throws IOException {
+		getOriginalReviews("data/id_reviews.txt");
+		
+	}
+	
+	public static void getOriginalReviews(String dir) throws IOException {
+		BufferedReader br = new BufferedReader(new FileReader(dir));
+		FileWriter wr = new FileWriter("data/original review.txt");
+		String line = "";
+		int count = 0;
+		
+		while ((line = br.readLine()) != null) {
+			String [] reviews = line.split(" @@ ");
+			String docNo = reviews[0];
+			
+			for (int i = 1; i < reviews.length; i++) {
+				count++;
+				int idx = reviews[i].indexOf(",", 13) + 2;
+				int lastIdx = reviews[i].lastIndexOf("'");
+				String review = new String();
+				if (lastIdx == -1 || lastIdx < idx)
+					review = reviews[i].substring(idx);	
+				else 
+					review = reviews[i].substring(idx, lastIdx);	
+				
+				String new1 = new String();
+				String newR = new String();
+				new1 = review.replaceAll("\\\\'", "'");
+				newR = new1.replaceAll("\\\\n", "");
+				
+				wr.write(count + "@@" + newR + "\n");
+			}
+		}
+		br.close();
+		wr.close();
+	}
+	
 	
 	public void PreProcessDoc(String dir) throws IOException {
 		BufferedReader br = new BufferedReader(new FileReader(dir));

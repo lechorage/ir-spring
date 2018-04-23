@@ -120,6 +120,9 @@ public class IndexWriter {
 		}
 		frReview.close();
 		
+		
+		
+		
 		// write token dictionary txt
 		FileWriter frToken = new FileWriter("data/token dictionary.txt");
 		for(Entry<String, int[]> entry: tokenMap.entrySet()) {
